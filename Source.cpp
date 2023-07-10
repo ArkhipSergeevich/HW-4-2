@@ -1,40 +1,56 @@
 #include <iostream>
-#include <string>
 #include <fstream>
+#include <string>
 
 class addresses
 {
 public:
-	void open_file_first(); //This function opens files, determines the number of addresses and deletes all data from the file out.txt
-	void open_file();  // This is copy of "open_file_first" but without the numbers counter and deleter
-	int one_address_input(int index_of_string);
-	void one_address_output();
-	addresses(std::string city_, std::string street_, int num_home_, int num_flat_);
-	std::string city;
+	void set_city(std::string _city)
+	{
+		city = _city;
+	}
+	void set_street(std::string _street)
+	{
+		street = _street;
+	}
+	void set_num_home(int _num_home)
+	{
+		num_home = _num_home;
+	}
+	void set_num_flat(int _num_flat)
+	{
+		num_flat = _num_flat;
+	}
+	std::string get_city()
+	{
+		return city;
+	}
+	std::string get_street()
+	{
+		return street;
+	}
+	int get_num_home()
+	{
+		return num_home;
+	}
+	int get_num_flat()
+	{
+		return num_flat;
+	}
 private:
-	std::string street;
-	int num_home = 0, num_flat = 0, size = 0;
+	std::string city, street;
+	int num_home, num_flat, size;
+};
+int open_file()
+{
+	int size = 0;
 	std::ifstream in_file;
 	std::ofstream out_file;
-	std::string mycop; // This is a class field used to skip some strings in the file
-};
-addresses::addresses(std::string city_, std::string street_, int num_home_, int num_flat_)
-{
-	city = city_;
-	street = street_;
-	num_home = num_home_;
-	num_flat = num_flat_;
-}
-
-void addresses::open_file_first()
-{
 	in_file.open("in.txt");
 	if (in_file.is_open())
 	{
 		in_file >> size;
-		out_file.open("out.txt"); // I use the "usual" opening to delete all the data from the file
-		out_file.close();
-		out_file.open("out.txt", std::ios_base::app);  // I open the file again this way to be able write down addresses one at a time
+		out_file.open("out.txt");
 		if (out_file.is_open())
 		{
 			out_file << "Number of addresses: " << size << std::endl;
@@ -48,103 +64,64 @@ void addresses::open_file_first()
 	{
 		std::cout << "file (in_file) is not open\n";
 	}
-}
-void addresses::open_file()
-{
-	in_file.open("in.txt");
-	if (in_file.is_open())
-	{
-		in_file >> size;
-		out_file.open("out.txt", std::ios_base::app);
-		if (out_file.is_open()) {}
-		else
-		{
-			std::cout << "file (out_file) is not open\n";
-		}
-	}
-	else
-	{
-		std::cout << "file (in_file) is not open\n";
-	}
-}
-int addresses::one_address_input(int index_of_string)
-{
-	for (int i = 0; i < index_of_string; i++)
-	{
-		in_file >> mycop;  // Skipping previous addresses 
-	}
-	in_file >> city;
-	in_file >> street;
-	in_file >> num_home;
-	in_file >> num_flat;
-	return 0;
-}
-void addresses::one_address_output()
-{
-	out_file << city << " ";
-	out_file << street << " ";
-	out_file << num_home << " ";
-	out_file << num_flat << "\n";
+	return size;
 }
 int main()
 {
 	setlocale(LC_ALL, "Russian");
-	int index_of_string = 0; // This variable I use for set the number of strings to skip
-	addresses address1("something", "something", 0, 0);
-	addresses address2("something", "something", 0, 0);
-	addresses address3("something", "something", 0, 0);
-	address1.open_file_first();
-	address1.one_address_input(index_of_string);
-	index_of_string += 4;
-	address2.open_file();
-	address2.one_address_input(index_of_string);
-	index_of_string += 4;
-	address3.open_file();
-	address3.one_address_input(index_of_string);
-	if (address1.city < address2.city)
+	std::ifstream in_file;
+	std::ofstream out_file;
+	in_file.open("in.txt");
+	int size;
+	size = open_file();
+	addresses* addresses_array = new addresses[size];
+	for (int i = 0; i < size; i++)
 	{
-		if (address1.city < address3.city)
+		std::string address;
+		int address_int;
+		std::ifstream in_file;
+		int size;
+		in_file.open("in.txt");
+		in_file >> size;
+		for (int i = 0; i < size; i++)
 		{
-			address1.one_address_output();
-			if (address2.city < address3.city)
-			{
-				address2.one_address_output();
-				address3.one_address_output();
-			}
-			else
-			{
-				address3.one_address_output();
-				address2.one_address_output();
-			}
-		}
-		else
-		{
-			address3.one_address_output();
-			address1.one_address_output();
-			address2.one_address_output();
-		}	
-	}
-	if (address1.city > address2.city)
-	{
-		if (address2.city < address3.city)
-		{
-			address2.one_address_output();
-			if (address1.city < address3.city)
-			{
-				address1.one_address_output();
-				address3.one_address_output();
-			}
-			else
-			{
-				address3.one_address_output();
-				address1.one_address_output();
-			}
-		}
-		else
-		{
-			address3.one_address_output();
-			address2.one_address_output();
-			address1.one_address_output();
+			in_file >> address;
+			addresses_array[i].set_city(address);
+			in_file >> address;
+			addresses_array[i].set_street(address);
+			in_file >> address_int;
+			addresses_array[i].set_num_home(address_int);
+			in_file >> address_int;
+			addresses_array[i].set_num_flat(address_int);
 		}
 	}
+
+		std::string storage;
+		int counter = 100;
+		while (counter != 0)
+		{
+			for (int i = 0; i < size - 1; i++)
+			{
+				int k = i + 1;
+				if (addresses_array[i].get_city() >= addresses_array[k].get_city())
+				{
+					storage = addresses_array[i].get_city();
+					addresses_array[i].get_city() = addresses_array[k].get_city();
+					addresses_array[k].get_city() = storage;
+				}
+				else
+				{
+					counter--;
+				}
+			}
+		}
+		out_file.open("out.txt");
+		for (int i = 0; i < size; i++)
+		{
+			out_file << addresses_array[i].get_city() << ", ";
+			out_file << addresses_array[i].get_street() << ", ";
+			out_file << addresses_array[i].get_num_home() << ", ";
+			out_file << addresses_array[i].get_num_flat() << std::endl;
+		}
+	delete[] addresses_array;
 }
